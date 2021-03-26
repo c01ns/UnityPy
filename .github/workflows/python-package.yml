@@ -3,8 +3,9 @@ name: Test and Publish
 on: [push, pull_request]
 
 jobs:
-  deploy:
 
+
+  deploy:
     strategy:
       fail-fast: false
       matrix:
@@ -38,7 +39,8 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install --upgrade wheel setuptools twine
-        pip install pytest lz4 brotli Pillow texture2ddecoder
+        pip install pytest pytest-cov
+        pip install lz4 brotli Pillow texture2ddecoder etcpak
     
     - name: Install module
       run: |
@@ -46,7 +48,7 @@ jobs:
     
     - name: Test with pytest
       run: |
-        pytest -v -s
+        pytest -v -s --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
       
     - name: Build Python wheel
       if: success() && runner.os != 'Linux' && github.event_name == 'push'

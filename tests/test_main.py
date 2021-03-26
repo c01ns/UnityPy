@@ -16,7 +16,6 @@ def test_read_batch():
         obj.read()
 
 def test_texture2d():
-    import UnityPy
     for f in os.listdir(SAMPLES):
         env = UnityPy.load(os.path.join(SAMPLES, f))
         for obj in env.objects:
@@ -26,9 +25,7 @@ def test_texture2d():
                 data.image = data.image.transpose(Image.ROTATE_90)
                 data.save()
 
-
 def test_sprite():
-    import UnityPy
     for f in os.listdir(SAMPLES):
         env = UnityPy.load(os.path.join(SAMPLES, f))
         for obj in env.objects:
@@ -37,14 +34,32 @@ def test_sprite():
 
 
 def test_audioclip():
-    import UnityPy
-    import platform
     env = UnityPy.load(os.path.join(SAMPLES, "char_118_yuki.ab"))
     for obj in env.objects:
         if obj.type == "AudioClip":
             clip = obj.read()
             assert(len(clip.samples) == 1)
 
+def test_repack():
+    for f in os.listdir(SAMPLES):
+        env = UnityPy.load(os.path.join(SAMPLES, f))
+        counter = 0
+        for obj in env.objects:
+            data = obj.read()
+            if obj.type == "Texture2D":
+                data.image = data.image.rotate(180)
+                data.save()
+            elif obj.type == "TextAsset":
+                data.text += "Test"
+                data.save()
+            counter += 1
+
+        re = env.file.save()
+        env2 = UnityPy.load(re)
+        for obj in env.objects:
+            data = obj.read()
+            counter -= 1
+        assert(counter == 0)
 
 if __name__ == "__main__":
     for x in list(locals()):
